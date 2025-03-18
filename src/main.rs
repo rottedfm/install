@@ -106,7 +106,7 @@ fn write_system_settings(gpu_driver: &str, hostname: &str) -> std::io::Result<()
 
   stylixSettings = {{
     enable = true;
-    wallpaper = "../wallpapers/sakura-wall.png";
+    wallpaper = ../wallpapers/sakura-wall.png;
     polarity = "dark";
   }};
 
@@ -120,7 +120,7 @@ fn write_system_settings(gpu_driver: &str, hostname: &str) -> std::io::Result<()
     let home_dir = env::var("HOME").expect("Failed to get HOME directory");
     let settings_path = format!("{}/.nix/system/settings.nix", home_dir);
 
-    let mut file = File::create_new(settings_path)?;
+    let mut file = File::create(settings_path)?;
     file.write_all(settings_nix_content.as_bytes())?;
 
     println!(
@@ -480,7 +480,7 @@ fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<(
     let home_dir = env::var("HOME").expect("Failed to get HOME directory");
     let settings_path = format!("{}/.nix/user/settings.nix", home_dir);
 
-    let mut file = File::create_new(settings_path)?;
+    let mut file = File::create(settings_path)?;
     file.write_all(user_settings_contents.as_bytes())?;
 
     println!(
@@ -576,6 +576,11 @@ MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
             .with_prompt("Please input your git email")
             .interact_text()
             .unwrap();
+
+        // wait time for clearing
+        sleep(Duration::from_millis(250));
+        term.clear_screen();
+        println!("{}", banner);
 
         if let Err(e) = write_user_settings(&git_username, &git_email) {
             eprintln!("Error writing settings.nix: {}", e);
