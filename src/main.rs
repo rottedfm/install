@@ -498,7 +498,7 @@ fn main() {
     if cli.full {
         // Setup the terminal
         let term = Term::stdout();
-        term.clear_screen();
+        let _ = term.clear_screen();
 
         // Print banner
         let banner = r#"
@@ -524,7 +524,7 @@ MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
 
         // wait time for clearing
         sleep(Duration::from_secs(1));
-        term.clear_screen();
+        let _ = term.clear_screen();
         println!("{}", banner);
 
         let gpu_driver_options = vec!["AMD", "NVIDIA"];
@@ -540,7 +540,7 @@ MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
 
         // wait time for clearing
         sleep(Duration::from_millis(250));
-        term.clear_screen();
+        let _ = term.clear_screen();
         println!("{}", banner);
 
         let hostname: String = Input::new()
@@ -550,7 +550,7 @@ MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
 
         // wait time for clearing
         sleep(Duration::from_millis(250));
-        term.clear_screen();
+        let _ = term.clear_screen();
         println!("{}", banner);
 
         if let Err(e) = write_system_settings(&gpu_driver, &hostname) {
@@ -559,7 +559,7 @@ MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
 
         // wait time for clearing
         sleep(Duration::from_millis(500));
-        term.clear_screen();
+        let _ = term.clear_screen();
         println!("{}", banner);
 
         let git_username: String = Input::new()
@@ -569,7 +569,7 @@ MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
 
         // wait time for clearing
         sleep(Duration::from_millis(250));
-        term.clear_screen();
+        let _ = term.clear_screen();
         println!("{}", banner);
 
         let git_email: String = Input::new()
@@ -579,7 +579,7 @@ MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
 
         // wait time for clearing
         sleep(Duration::from_millis(250));
-        term.clear_screen();
+        let _ = term.clear_screen();
         println!("{}", banner);
 
         if let Err(e) = write_user_settings(&git_username, &git_email) {
