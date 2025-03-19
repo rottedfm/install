@@ -45,6 +45,51 @@ fn clone_git_repo(repo_url: &str, repo_name: &str) -> io::Result<()> {
     }
 }
 
+fn copy_hardware_configuration() -> io::Result<()> {
+    let home_dir = env::var("HOME").expect("Failed to get HOME directory");
+    let destination = format!("{}/.nix/system", home_dir);
+
+    let status = Command::new("sudo")
+        .args(["cp", "/etc/nixos/hardware-configuration", &destination])
+        .status()?;
+
+    if status.success() {
+        println!(
+            "{} - Successfully copied hardware-configuration to {}",
+            style("Success").green(),
+            destination
+        );
+        Ok(())
+    } else {
+        eprintln!("Failed to clone the repository.");
+        Err(io::Error::new(
+            io::ErrorKind::Other,
+            "Hardware-configuration copy failed",
+        ))
+    }
+}
+
+fn run_sync() -> io::Result<()> {
+    let home_dir = env::var("HOME").expect("Failed to get HOME directory");
+    let path = format!("{}/Scripts/sync/target/release/sync", home_dir);
+
+    let status = Command::new(path).arg("--skip-git").status()?;
+
+    if status.success() {
+        println!(
+            "{} - Successfully ran system sync.",
+            style("Success").green(),
+        );
+        Ok(())
+    } else {
+        eprintln!("Failed to run system sync.");
+        Err(io::Error::new(
+            io::ErrorKind::Other,
+            "Hardware-configuration copy failed",
+        ))
+    }
+}
+
 fn write_system_settings(gpu_driver: &str, hostname: &str) -> std::io::Result<()> {
     let ollama_acceleration = if gpu_driver == "NVIDIA" {
         "cuda"
@@ -132,7 +177,7 @@ fn write_system_settings(gpu_driver: &str, hostname: &str) -> std::io::Result<()
 
 fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<()> {
     let user_settings_contents = format!(
-        r###"{{config, lib, pkgs, ... }}:
+        r#"{{config, lib, pkgs, ... }}:
     {{
         imports = [
             # firefox
@@ -145,16 +190,8 @@ fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<(
             ./modules/hyprland.nix
             # kitty
             ./modules/kitty.nix
-            # minecraft
-            ./modules/minecraft.nix
-            # qutebrowser
-            ./modules/qutebrowser.nix
-            # tofi
-            ./modules/tofi.nix
             # stylix
             ./modules/stylix.nix
-            # waybar
-            ./modules/waybar.nix
             # zellij
             ./modules/zellij.nix
             # zsh
@@ -294,41 +331,6 @@ fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<(
             }};
         }};
 
-        # minecraft
-        minecraftSettings = {{
-           enable = true;
-        }};
-
-        # qutebrowser
-        qutebrowserSettings = {{
-           enable = true;
-        }};
-
-        # tofi
-        tofiSettings = {{
-            enable = true;
-            settings = {{
-                width = "100%";
-                height = "100%";
-                prompt-text = "/launch";
-                prompt-padding = 5;
-                border-width = 0;
-                outline-width = 0;
-                padding-left = "35%";
-                padding-top = "35%";
-                result-spacing = 25;
-                num-results = 10;
-                drun-launch = true;
-                background-color = lib.mkForce "##000A";
-                prompt-background = lib.mkForce "##00000000";
-                input-background = lib.mkForce "##00000000";
-                placeholder-background = lib.mkForce "##00000000";
-                default-result-background = lib.mkForce "#00000000";
-                alternate-result-background = lib.mkForce "##00000000";
-                selection-background = lib.mkForce "##00000000";
-            }};
-        }};
-
         # stylix
         stylixSettings = {{
            enable = true;
@@ -337,114 +339,6 @@ fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<(
            opacity = {{
                desktop = 0.4;
            }};
-        }};
-
-        # waybar
-        waybarSettings = {{
-            enable = true;
-            settings = {{
-               mainBar = {{
-                   layer = "top";
-                   position = "bottom";
-                   spacing = 5;
-                   height = 36;
-                   modules-left = [
-                       "custom/logo"
-                       "hyprland/workspaces"
-                   ];
-
-                   modules-center = [ "cava" ];
-
-                   modules-right = [
-                     "pulseaudio"  
-                     "memory"
-                     "tray"
-                     "clock"
-                   ];
-
-                   "custom/logo" = {{
-                       exec = "echo '  '";
-                   }};
-
-                   clock = {{
-                      interval = 10;
-                      format = "  {{:%Y-%m-%d %H:%M}}";     
-                      tooltip = false;
-                   }};
-
-                   cpu = {{
-                      interval = 5;
-                      tooltip = false;
-                      format = "  {{usage}}%"; 
-                      format-alt = "  {{load}}"; 
-                      states = {{
-                         warning = 70;
-                         critical = 90; 
-                      }};
-                   }};
-
-                   memory = {{
-                       interval = 5;
-                       format = "  {{used:0.1f}}GB/{{total:0.1f}}GB";
-                       states = {{
-                           warning = 70;
-                           critical = 90;
-                       }};
-                       tooltip = false;
-                   }};
-
-                   "hyprland/workspaces" = {{
-                       format = "{{icon}}";
-                       format-icons = {{
-                           "1" = "一";
-                           "2" = "二";
-                           "3" = "三";
-                           "4" = "四";
-                           "5" = "五";
-                           "6" = "六";
-                           "7" = "七";
-                           "8" = "八";
-                           "9" = "九";
-                           "10" = "十";
-                       }};
-                       persistent-workspaces = {{
-                           "*" = 10;
-                       }};
-                   }};
-
-                   pulseaudio = {{
-                       format = "{{icon}} {{volume}}%";
-                       format-bluetooth = "{{icon}} {{volume}}%";
-                       format-muted = "  ";
-                       format-icons = {{
-                          headphone = "  ";
-                          hands-free = "  ";
-                          headset = " ";
-                          phone = " ";
-                          portable = " ";
-                          car = " ";
-                          default = [" " "  "];     
-                       }};
-                       scroll-step = 1;
-                       tooltip = false;
-                   }};
-
-                   cava = {{
-                       framerate = 120;
-                       autosens = 1;
-                       bars = 24; 
-                       method = "pulse";
-                       source = "auto";
-                       hide_on_silence = true;
-                       bar_delimiter = 0;
-                       monstercat = false; 
-                       waves = false;
-                       noise_reduction = 0.65;
-                       input_delay = 2;
-                       format-icons = [ "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█" ];
-                   }};
-               }};
-            }};
         }};
 
         # zellij
@@ -473,7 +367,7 @@ fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<(
            extraPackages = [ pkgs.noto-fonts-cjk-sans pkgs.eza pkgs.cmatrix pkgs.bottom pkgs.ttyper pkgs.neofetch pkgs.cloc pkgs.pom pkgs.cava ];
         }};
     }}
-    "###,
+    "#,
         git_username, git_email
     );
 
@@ -508,7 +402,7 @@ fn main() {
 $$$  $$$ "Y$c$$  '''    $    $$   c$$$cc$$$c  $$'      $$'     
 888  888    Y88 88b    dP    88,   888   888,o88oo,.__o88oo,.__
 MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
----------------------------------------------------------------"#;
+"#;
         println!("{}", banner);
 
         // Git repo vars
@@ -520,6 +414,15 @@ MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
         match clone_git_repo(repo_url, &repo_name) {
             Ok(_) => println!("{} - Cloned git repo.", style("Success").green()),
             Err(e) => eprintln!("{} - {}.", style("Error").red(), e),
+        }
+
+        println!(
+            "{} - Copying hardware-configuration to .nix/system.",
+            style("Info").cyan()
+        );
+
+        if let Err(e) = copy_hardware_configuration() {
+            eprintln!("Error copying hardware-configuration {}", e);
         }
 
         // wait time for clearing
@@ -584,6 +487,25 @@ MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
 
         if let Err(e) = write_user_settings(&git_username, &git_email) {
             eprintln!("Error writing settings.nix: {}", e);
+        }
+
+        // wait time for clearing
+        sleep(Duration::from_millis(250));
+        let _ = term.clear_screen();
+        println!("{}", banner);
+
+        let sync_repo_url = "https://github.com/rottedfm/sync.git";
+        let sync_repo_name = "Scripts/sync";
+
+        // Clone git repo
+        println!("{} - Cloning git repo...", style("Info").cyan());
+        match clone_git_repo(sync_repo_url, &sync_repo_name) {
+            Ok(_) => println!("{} - Cloned git repo.", style("Success").green()),
+            Err(e) => eprintln!("{} - {}.", style("Error").red(), e),
+        }
+
+        if let Err(e) = run_sync() {
+            eprintln!("Error running sync: {}", e);
         }
     }
 }
