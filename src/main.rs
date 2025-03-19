@@ -470,7 +470,7 @@ fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<(
            zshrc = ''
             source ~/.nix/user/modules/zsh/p10k.zsh
            '';
-           extraPackages = [ pkg.noto-fonts-cjk-sans pkgs.eza pkgs.cmatrix pkgs.bottom pkgs.ttyper pkgs.neofetch pkgs.cloc pkgs.pom pkgs.cava ];
+           extraPackages = [ pkgs.noto-fonts-cjk-sans pkgs.eza pkgs.cmatrix pkgs.bottom pkgs.ttyper pkgs.neofetch pkgs.cloc pkgs.pom pkgs.cava ];
         }};
     }}
     "###,
