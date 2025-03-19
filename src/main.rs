@@ -49,8 +49,8 @@ fn copy_hardware_configuration() -> io::Result<()> {
     let home_dir = env::var("HOME").expect("Failed to get HOME directory");
     let destination = format!("{}/.nix/system", home_dir);
 
-    let status = Command::new("sudo")
-        .args(["cp", "/etc/nixos/hardware-configuration", &destination])
+    let status = Command::new("cp")
+        .args(["-f", "/etc/nixos/hardware-configuration.nix", &destination])
         .status()?;
 
     if status.success() {
@@ -415,6 +415,11 @@ MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
             Ok(_) => println!("{} - Cloned git repo.", style("Success").green()),
             Err(e) => eprintln!("{} - {}.", style("Error").red(), e),
         }
+
+        // wait time for clearing
+        sleep(Duration::from_millis(500));
+        let _ = term.clear_screen();
+        println!("{}", banner);
 
         println!(
             "{} - Copying hardware-configuration to .nix/system.",
