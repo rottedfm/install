@@ -132,7 +132,7 @@ fn write_system_settings(gpu_driver: &str, hostname: &str) -> std::io::Result<()
 
 fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<()> {
     let user_settings_contents = format!(
-        r#"{{config, lib, pkgs, ... }}:
+        r###"{{config, lib, pkgs, ... }}:
     {{
         imports = [
             # firefox
@@ -319,13 +319,13 @@ fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<(
                 result-spacing = 25;
                 num-results = 10;
                 drun-launch = true;
-                background-color = lib.mkForce '#000A';
-                prompt-background = lib.mkForce '#00000000';
-                input-background = lib.mkForce '#00000000';
-                placeholder-background = lib.mkForce '#00000000';
-                default-result-background = lib.mkForce '#00000000';
-                alternate-result-background = lib.mkForce '#00000000';
-                selection-background = lib.mkForce '#00000000';
+                background-color = lib.mkForce "##000A";
+                prompt-background = lib.mkForce "##00000000";
+                input-background = lib.mkForce "##00000000";
+                placeholder-background = lib.mkForce "##00000000";
+                default-result-background = lib.mkForce "#00000000";
+                alternate-result-background = lib.mkForce "##00000000";
+                selection-background = lib.mkForce "##00000000";
             }};
         }};
 
@@ -364,7 +364,7 @@ fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<(
 
                    "custom/logo" = {{
                        exec = "echo '  '";
-                   }}
+                   }};
 
                    clock = {{
                       interval = 10;
@@ -473,7 +473,7 @@ fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<(
            extraPackages = [ pkg.noto-fonts-cjk-sans pkgs.eza pkgs.cmatrix pkgs.bottom pkgs.ttyper pkgs.neofetch pkgs.cloc pkgs.pom pkgs.cava ];
         }};
     }}
-    "#,
+    "###,
         git_username, git_email
     );
 
