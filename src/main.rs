@@ -19,9 +19,9 @@ $$$  $$$ "Y$c$$  '''    $    $$   c$$$cc$$$c  $$'      $$'
 MMM  MMM     YM  "YMmMY"     MMM   YMM   ""` """"YUMMM""""YUMMM
 "#, long_about = None)]
 struct Cli {
-    /// full install
+    /// minimal install
     #[arg(long)]
-    full: bool,
+    minimal: bool,
 }
 
 fn clone_git_repo(repo_url: &str, repo_name: &str) -> io::Result<()> {
@@ -389,7 +389,7 @@ fn main() {
     // Parse cli args
     let cli = Cli::parse();
 
-    if cli.full {
+    if cli.minimal {
         // Setup the terminal
         let term = Term::stdout();
         let _ = term.clear_screen();
