@@ -73,7 +73,7 @@ fn run_sync() -> io::Result<()> {
     let home_dir = env::var("HOME").expect("Failed to get HOME directory");
     let path = format!("{}/Scripts/sync/target/release/sync", home_dir);
 
-    let status = Command::new(path).arg("--skip-git").status()?;
+    let status = Command::new(path).arg("--first-sync").status()?;
 
     if status.success() {
         println!(
@@ -110,6 +110,7 @@ fn write_system_settings(gpu_driver: &str, hostname: &str) -> std::io::Result<()
     ./modules/ollama.nix
     ./modules/sound.nix
     ./modules/stylix.nix
+    ./modules/git.nix
     ./modules/zsh.nix
   ];
 
@@ -118,10 +119,15 @@ fn write_system_settings(gpu_driver: &str, hostname: &str) -> std::io::Result<()
     enableSystemdBoot = true;
   }};
 
+  gitSettings = {{
+      enable = true;
+  }};
+
   gpuSettings = {{
     enable = true;
     driver = "{}";
   }};
+
 
   hyprlandSettings = {{
     enable = true;
@@ -236,7 +242,6 @@ fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<(
         hyprlandSettings = {{
             enable = true;
             settings = {{
-                exec-once = ["waybar"];
                 env = [
                     "XDG_CURRENT_DESKTOP,Hyprland"
                     "XDG_SESSION_TYPE,wayland"
@@ -353,7 +358,7 @@ fn write_user_settings(git_username: &str, git_email: &str) -> std::io::Result<(
                shutdown = "shutdown now";
                ls = "eza --icons -a --group-directories-first";
                tree = "eza --color=auto --tree";
-               dev = "nix develop ~/.system/shell";
+               dev = "nix develop ~/.nix/shell";
            }};
            plugins = [
                "zsh-users/zsh-autosuggestions"  
